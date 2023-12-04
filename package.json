@@ -1,8 +1,8 @@
 {
-  "name": "hardhat-template",
+  "name": "worldid-integration-contracts",
   "version": "1.0.0",
   "license": "MIT",
-  "author": "Distributed Lab",
+  "author": "Rarimo Foundation",
   "description": "",
   "scripts": {
     "install": "npx husky install",
