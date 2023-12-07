@@ -39,10 +39,6 @@ contract IdentityManager is IIdentityManager, Signers {
             _latestRoot = postRoot_;
             _latestTimestamp = replacedAt_;
         }
-        // r0 r1 r2 r3 r4 r5
-
-        // r0 -> r5, r4 -> r5
-        // r0 -> r1, r1 -> r5, r4 -> r5
 
         RootData storage _prevRoot = _roots[prevRoot_];
 
