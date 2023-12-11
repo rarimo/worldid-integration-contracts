@@ -31,6 +31,10 @@ contract IdentityManager is IIdentityManager, Signers {
         uint256 replacedAt_,
         bytes calldata proof_
     ) external override {
+        RootData storage _prevRoot = _roots[prevRoot_];
+
+        require(_prevRoot.replacedAt == 0, "IdentityManager: can't update already stored root");
+
         _checkMerkleSignature(_getSignHash(prevRoot_, postRoot_, replacedAt_), proof_);
 
         if (replacedAt_ >= _latestTimestamp) {
@@ -39,8 +43,6 @@ contract IdentityManager is IIdentityManager, Signers {
             _latestRoot = postRoot_;
             _latestTimestamp = replacedAt_;
         }
-
-        RootData storage _prevRoot = _roots[prevRoot_];
 
         if (_prevRoot.replacedBy != 0) {
             _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
@@ -57,7 +59,7 @@ contract IdentityManager is IIdentityManager, Signers {
             return true;
         }
 
-        if (isCurrentRoot(root_)) {
+        if (isLatestRoot(root_)) {
             return false;
         }
 
@@ -65,10 +67,10 @@ contract IdentityManager is IIdentityManager, Signers {
     }
 
     function rootExists(uint256 root_) public view override returns (bool) {
-        return _roots[root_].replacedAt != 0 || isCurrentRoot(root_);
+        return _roots[root_].replacedAt != 0 || isLatestRoot(root_);
     }
 
-    function isCurrentRoot(uint256 root) public view override returns (bool) {
+    function isLatestRoot(uint256 root) public view override returns (bool) {
         return _latestRoot == root;
     }
 
@@ -83,7 +85,7 @@ contract IdentityManager is IIdentityManager, Signers {
             RootInfo({
                 replacedBy: _root.replacedBy,
                 replacedAt: _root.replacedAt,
-                isCurrent: isCurrentRoot(root_),
+                isLatest: isLatestRoot(root_),
                 isExpired: isExpiredRoot(root_)
             });
     }

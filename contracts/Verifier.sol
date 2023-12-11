@@ -26,11 +26,13 @@ contract Verifier is IVerifier, Initializable {
         uint256 nullifierHash_,
         uint256 externalNullifierHash_,
         uint256[8] calldata proof_
-    ) external override {
+    ) public virtual override {
         require(
             !IIdentityManager(identityManager).isExpiredRoot(root_),
             "Verifier: root is expired"
         );
+
+        _beforeProofValidation();
 
         ISemaphoreVerifier(semaphoreVerifier).verifyProof(
             proof_,
@@ -39,6 +41,8 @@ contract Verifier is IVerifier, Initializable {
 
         _afterProofValidation();
     }
+
+    function _beforeProofValidation() internal virtual {}
 
     function _afterProofValidation() internal virtual {}
 }
