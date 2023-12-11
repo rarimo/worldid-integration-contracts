@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+import "@solarity/solidity-lib/access-control/MultiOwnable.sol";
+
 import "@rarimo/evm-bridge-contracts/utils/Signers.sol";
 
 import "./interfaces/IIdentityManager.sol";
 
-contract IdentityManager is IIdentityManager, Signers {
+contract IdentityManager is IIdentityManager, Signers, MultiOwnable {
     uint256 public constant ROOT_EXPIRATION_TIME = 1 hours;
 
     address public sourceStateContract;
@@ -21,6 +23,7 @@ contract IdentityManager is IIdentityManager, Signers {
         string calldata chainName_
     ) external initializer {
         __Signers_init(signer_, chainName_);
+        __MultiOwnable_init();
 
         sourceStateContract = sourceStateContract_;
     }
@@ -52,6 +55,41 @@ contract IdentityManager is IIdentityManager, Signers {
         _prevRoot.replacedBy = postRoot_;
 
         emit SignedRootTransited(prevRoot_, postRoot_, replacedAt_, _latestRoot);
+    }
+
+    function signedTransitRootOwner(
+        uint256 prevRoot_,
+        uint256 postRoot_,
+        uint256 replacedAt_,
+        bytes calldata proof_
+    ) external onlyOwner {
+        RootData storage _prevRoot = _roots[prevRoot_];
+
+        require(_prevRoot.replacedAt == 0, "IdentityManager: can't update already stored root");
+
+        if (replacedAt_ >= _latestTimestamp) {
+            _roots[_latestRoot].replacedBy = postRoot_;
+
+            _latestRoot = postRoot_;
+            _latestTimestamp = replacedAt_;
+        }
+
+        if (_prevRoot.replacedBy != 0) {
+            _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
+        }
+
+        _prevRoot.replacedAt = replacedAt_;
+        _prevRoot.replacedBy = postRoot_;
+
+        emit SignedRootTransited(prevRoot_, postRoot_, replacedAt_, _latestRoot);
+    }
+
+    function changeSignerOwner(bytes calldata newSignerPubKey_) external onlyOwner {
+        signer = _convertPubKeyToAddress(newSignerPubKey_);
+    }
+
+    function changeSourceStateContractOwner(address newSourceStateContract_) external onlyOwner {
+        sourceStateContract = newSourceStateContract_;
     }
 
     function isExpiredRoot(uint256 root_) public view override returns (bool) {
