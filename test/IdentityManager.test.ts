@@ -7,7 +7,7 @@ import { SignHelper } from "@/test/utils/signature";
 import { MerkleTreeHelper } from "@/test/utils/merkletree";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { IdentityManager } from "@ethers-v6";
-import {ZERO_ADDR} from "@/scripts/utils/constants";
+import { ZERO_ADDR } from "@/scripts/utils/constants";
 
 describe("IdentityManager", () => {
   const reverter = new Reverter();
@@ -57,9 +57,10 @@ describe("IdentityManager", () => {
     });
 
     it("should not initialize twice", async () => {
-      await expect(
-          identityManager.__IdentityManager_init(ZERO_ADDR, ZERO_ADDR, "")
-      ).to.be.revertedWithCustomError(identityManager, "InvalidInitialization")
+      await expect(identityManager.__IdentityManager_init(ZERO_ADDR, ZERO_ADDR, "")).to.be.revertedWithCustomError(
+        identityManager,
+        "InvalidInitialization",
+      );
     });
   });
 
@@ -67,7 +68,7 @@ describe("IdentityManager", () => {
     it("should commit root transition if all conditions are met", async () => {
       const { prevRoot, postRoot, replacedAt } = rootHistory[0];
 
-      const leaf= merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt);
+      const leaf = merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt);
       const proof = merkleHelper.getProof(leaf);
 
       await identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof);
