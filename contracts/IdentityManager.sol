@@ -66,17 +66,18 @@ contract IdentityManager is IIdentityManager, Signers, MultiOwnable {
     ) external onlyOwner {
         RootData storage _prevRoot = _roots[prevRoot_];
 
+        require(prevRoot_ != postRoot_, "IdentityManager: same prev and post roots");
         require(_prevRoot.replacedAt == 0, "IdentityManager: can't update already stored root");
+
+        if (_prevRoot.replacedBy != 0) {
+            _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
+        }
 
         if (replacedAt_ >= _latestTimestamp) {
             _roots[_latestRoot].replacedBy = postRoot_;
 
             _latestRoot = postRoot_;
             _latestTimestamp = replacedAt_;
-        }
-
-        if (_prevRoot.replacedBy != 0) {
-            _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
         }
 
         _prevRoot.replacedAt = replacedAt_;
