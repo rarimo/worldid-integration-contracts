@@ -64,7 +64,31 @@ describe("IdentityManager", () => {
     });
   });
 
-  describe("#signedTransitRoot", () => {
+  describe.only("#signedTransitRoot", () => {
+    it("should not commit root transition twice", async () => {
+      const { prevRoot, postRoot, replacedAt } = rootHistory[0];
+
+      const leaf = merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt);
+      const proof = merkleHelper.getProof(leaf);
+
+      await identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof);
+
+      await expect(identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof)).to.be.revertedWith(
+        "IdentityManager: can't update already stored root",
+      );
+    });
+
+    it("should not commit root transition if invalid signature", async () => {
+      const { prevRoot, postRoot, replacedAt } = rootHistory[0];
+
+      const leaf = merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt + 1);
+      const proof = merkleHelper.getProof(leaf);
+
+      await expect(identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof)).to.be.revertedWith(
+        "Signers: invalid signature",
+      );
+    });
+
     it("should commit root transition if all conditions are met", async () => {
       const { prevRoot, postRoot, replacedAt } = rootHistory[0];
 
@@ -72,6 +96,8 @@ describe("IdentityManager", () => {
       const proof = merkleHelper.getProof(leaf);
 
       await identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof);
+
+      expect(await identityManager.getLatestRoot()).to.be.deep.eq([postRoot, replacedAt]);
     });
   });
 });
