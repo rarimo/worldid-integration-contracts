@@ -27,6 +27,7 @@ describe("IdentityManager", () => {
     { prevRoot: 2, postRoot: 3, replacedAt: 200 },
     { prevRoot: 3, postRoot: 4, replacedAt: 300 },
     { prevRoot: 4, postRoot: 5, replacedAt: 400 },
+    { prevRoot: 5, postRoot: 6, replacedAt: 500 },
   ];
 
   before(async () => {
@@ -98,6 +99,53 @@ describe("IdentityManager", () => {
       await identityManager.signedTransitRoot(prevRoot, postRoot, replacedAt, proof);
 
       expect(await identityManager.getLatestRoot()).to.be.deep.eq([postRoot, replacedAt]);
+    });
+
+    it("should maintain root history and latest root properly while complex transitions", async () => {
+      const proofs = rootHistory.map((transition) => {
+        const { prevRoot, postRoot, replacedAt } = transition;
+
+        const leaf = merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt);
+
+        return merkleHelper.getProof(leaf);
+      });
+
+      await identityManager.signedTransitRoot(
+        rootHistory[0].prevRoot,
+        rootHistory[0].postRoot,
+        rootHistory[0].replacedAt,
+        proofs[0],
+      );
+
+      await identityManager.signedTransitRoot(
+        rootHistory[1].prevRoot,
+        rootHistory[1].postRoot,
+        rootHistory[1].replacedAt,
+        proofs[1],
+      );
+
+      expect(await identityManager.getLatestRoot()).to.be.deep.eq([rootHistory[1].postRoot, rootHistory[1].replacedAt]);
+
+      await identityManager.signedTransitRoot(
+        rootHistory[4].prevRoot,
+        rootHistory[4].postRoot,
+        rootHistory[4].replacedAt,
+        proofs[4],
+      );
+
+      expect(await identityManager.getLatestRoot()).to.be.deep.eq([rootHistory[4].postRoot, rootHistory[4].replacedAt]);
+      expect((await identityManager.getRootInfo(rootHistory[1].postRoot)).replacedBy).to.be.eq(rootHistory[4].postRoot);
+
+      await identityManager.signedTransitRoot(
+        rootHistory[2].prevRoot,
+        rootHistory[2].postRoot,
+        rootHistory[2].replacedAt,
+        proofs[2],
+      );
+
+      expect(await identityManager.getLatestRoot()).to.be.deep.eq([rootHistory[4].postRoot, rootHistory[4].replacedAt]);
+      expect((await identityManager.getRootInfo(rootHistory[1].postRoot)).replacedBy).to.be.eq(rootHistory[2].postRoot);
+      expect((await identityManager.getRootInfo(rootHistory[2].postRoot)).replacedBy).to.be.eq(rootHistory[4].postRoot);
     });
   });
 });
