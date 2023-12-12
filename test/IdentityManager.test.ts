@@ -64,7 +64,7 @@ describe("IdentityManager", () => {
   });
 
   describe("#signedTransitRoot", () => {
-    it.only("should commit root transition if all conditions are met", async () => {
+    it("should commit root transition if all conditions are met", async () => {
       const { prevRoot, postRoot, replacedAt } = rootHistory[0];
 
       const leaf= merkleHelper.encodeLeaf(prevRoot, postRoot, replacedAt);
