@@ -48,11 +48,13 @@ describe("IdentityManager", () => {
 
     await identityManager.__IdentityManager_init(SIGNER.address, sourceStateContractAddress, CHAIN_NAME);
 
-    roots = Array.from({ length: 5 }).map((_, idx) => ({
-      prevRoot: idx + 1,
-      postRoot: idx + 2,
-      replacedAt: 100 * (idx + 1),
-    }));
+    roots = [
+      { prevRoot: 1, postRoot: 2, replacedAt: 100 },
+      { prevRoot: 2, postRoot: 3, replacedAt: 200 },
+      { prevRoot: 3, postRoot: 4, replacedAt: 300 },
+      { prevRoot: 4, postRoot: 5, replacedAt: 400 },
+      { prevRoot: 5, postRoot: 6, replacedAt: 500 },
+    ];
 
     proofs = roots.map((transition) => {
       const { prevRoot, postRoot, replacedAt } = transition;
@@ -98,7 +100,16 @@ describe("IdentityManager", () => {
     });
 
     it("should commit root transition if all conditions are met", async () => {
-      await identityManager.signedTransitRoot(roots[0].prevRoot, roots[0].postRoot, roots[0].replacedAt, proofs[0]);
+      const tx = identityManager.signedTransitRoot(
+        roots[0].prevRoot,
+        roots[0].postRoot,
+        roots[0].replacedAt,
+        proofs[0],
+      );
+
+      await expect(tx)
+        .to.emit(identityManager, "SignedRootTransited")
+        .withArgs(roots[0].prevRoot, roots[0].postRoot, roots[0].replacedAt, roots[0].postRoot);
 
       expect(await identityManager.getLatestRoot()).to.be.deep.eq([roots[0].postRoot, roots[0].replacedAt]);
     });
@@ -173,6 +184,20 @@ describe("IdentityManager", () => {
           replacedAt: roots[0].replacedAt,
           isLatest: false,
           isExpired: false,
+        });
+
+        compareRootInfo(await identityManager.getRootInfo(roots[1].postRoot), {
+          replacedBy: 0,
+          replacedAt: 0,
+          isLatest: true,
+          isExpired: false,
+        });
+
+        compareRootInfo(await identityManager.getRootInfo(0), {
+          replacedBy: roots[0].postRoot,
+          replacedAt: 0,
+          isLatest: false,
+          isExpired: true,
         });
       });
     });

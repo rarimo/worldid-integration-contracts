@@ -37,15 +37,15 @@ contract IdentityManager is IIdentityManager, Signers {
 
         _checkMerkleSignature(_getSignHash(prevRoot_, postRoot_, replacedAt_), proof_);
 
+        if (_prevRoot.replacedBy != 0) {
+            _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
+        }
+
         if (replacedAt_ >= _latestTimestamp) {
             _roots[_latestRoot].replacedBy = postRoot_;
 
             _latestRoot = postRoot_;
             _latestTimestamp = replacedAt_;
-        }
-
-        if (_prevRoot.replacedBy != 0) {
-            _roots[postRoot_].replacedBy = _prevRoot.replacedBy;
         }
 
         _prevRoot.replacedAt = replacedAt_;
