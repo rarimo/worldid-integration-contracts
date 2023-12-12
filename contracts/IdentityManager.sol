@@ -33,6 +33,7 @@ contract IdentityManager is IIdentityManager, Signers {
     ) external override {
         RootData storage _prevRoot = _roots[prevRoot_];
 
+        require(prevRoot_ != postRoot_, "IdentityManager: same prev and post roots");
         require(_prevRoot.replacedAt == 0, "IdentityManager: can't update already stored root");
 
         _checkMerkleSignature(_getSignHash(prevRoot_, postRoot_, replacedAt_), proof_);

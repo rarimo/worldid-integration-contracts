@@ -93,6 +93,12 @@ describe("IdentityManager", () => {
       ).to.be.revertedWith("IdentityManager: can't update already stored root");
     });
 
+    it("should not commit root transition where prev and post roots are the same", async () => {
+      await expect(
+        identityManager.signedTransitRoot(roots[0].prevRoot, roots[0].prevRoot, roots[0].replacedAt, proofs[0]),
+      ).to.be.revertedWith("IdentityManager: same prev and post roots");
+    });
+
     it("should not commit root transition if invalid signature", async () => {
       await expect(
         identityManager.signedTransitRoot(roots[0].prevRoot, roots[0].postRoot, roots[0].replacedAt, proofs[1]),
