@@ -3,12 +3,12 @@ pragma solidity 0.8.20;
 
 import "@solarity/solidity-lib/access-control/MultiOwnable.sol";
 
-import "@rarimo/evm-bridge-contracts/utils/Signers.sol";
+import {Signers} from "@rarimo/evm-bridge-contracts/utils/Signers.sol";
 
 import "./interfaces/IIdentityManager.sol";
 
 contract IdentityManager is IIdentityManager, Signers, MultiOwnable {
-    uint256 public constant ROOT_EXPIRATION_TIME = 1 hours;
+    uint256 public constant ROOT_EXPIRATION_TIME = 1 days * 365;
 
     address public sourceStateContract;
 
