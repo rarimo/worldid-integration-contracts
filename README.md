@@ -30,7 +30,7 @@ npm run coverage
 
 ### Deployment
 
-Prior deployment create the `.env` file following the example provided in `.env.example` file. Also check out the required config in the `deploy/config/config.json` file.
+Prior deployment create the `.env` file following the example provided in `.env.example`. Also check out the required config in the `deploy/config/config.json` file.
 
 The config structure is the following:
 
