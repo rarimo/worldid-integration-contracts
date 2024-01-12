@@ -1,4 +1,4 @@
-# WordlID integration contracts
+# WorldID integration contracts
 
 This repository manages the smart contracts that handle Rarimo <> WorldID integration.
 
@@ -42,7 +42,7 @@ The config structure is the following:
 }
 ```
 
-Where `signer` is the Rarimo TSS signer, `sourceStateContract` is the address of WorldID manager contract to listed to, and `chainName` is the name of the network (e.g. Ethereum, Sepolia, Mumbai) where the contract is being deployed to.
+Where `signer` is the address of Rarimo TSS signer, `sourceStateContract` is the address of WorldID manager contract to listed to, and `chainName` is the name of the network (e.g. Ethereum, Sepolia, Mumbai) where the contracts are being deployed to.
 
 After the configuration is provided, execute:
 
