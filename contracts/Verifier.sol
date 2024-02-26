@@ -8,10 +8,18 @@ import "./vendor/worldcoin/world-id-contracts/interfaces/ISemaphoreVerifier.sol"
 import "./interfaces/IIdentityManager.sol";
 import "./interfaces/IVerifier.sol";
 
+/**
+ * @title The Verifier contract that calls ZK verifier and checks that the verification is made against the **not expired root**
+ */
 contract Verifier is IVerifier, Initializable {
     address public semaphoreVerifier;
     address public identityManager;
 
+    /**
+     * @notice The init function
+     * @param semaphoreVerifier_ ZK verifier
+     * @param identityManager_ Rarimo identity manager contract
+     */
     function __Verifier_init(
         address semaphoreVerifier_,
         address identityManager_
@@ -20,6 +28,14 @@ contract Verifier is IVerifier, Initializable {
         identityManager = identityManager_;
     }
 
+    /**
+     * @notice The function to verify ZK proof
+     * @param root_ the state root
+     * @param signalHash_ WorldID signal Hash
+     * @param nullifierHash_ WorldID nullifier Hash
+     * @param externalNullifierHash_ WorldID external nullifier hash
+     * @param proof_ ZK proof
+     */
     function verifyProof(
         uint256 root_,
         uint256 signalHash_,
