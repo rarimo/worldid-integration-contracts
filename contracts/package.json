@@ -1,6 +1,6 @@
 {
   "name": "@rarimo/worldid-integration-contracts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "author": "Global Web3 Sandbox Ltd",
   "description": "WorldID <> Rarimo",
@@ -14,6 +14,7 @@
     "!mock/**/*"
   ],
   "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "5.0.0",
     "@rarimo/evm-bridge-contracts": "1.0.0"
   }
 }
