@@ -1,9 +1,14 @@
 {
-  "name": "worldid-integration-contracts",
+  "name": "@rarimo/worldid-integration-contracts",
   "version": "1.0.0",
   "license": "MIT",
-  "author": "Rarimo Foundation",
-  "description": "",
+  "author": "Global Web3 Sandbox Ltd",
+  "description": "WorldID <> Rarimo",
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart-contracts"
+  ],
   "scripts": {
     "install": "npx husky install",
     "compile": "npx hardhat compile",
@@ -28,7 +33,8 @@
     "lint-fix": "npm run lint-sol-fix && npm run lint-ts-fix && npm run lint-json-fix",
     "lint-json-fix": "prettier --write \"./**/*.json\"",
     "lint-ts-fix": "prettier --write \"./**/*.ts\"",
-    "lint-sol-fix": "prettier --write \"contracts/**/*.sol\""
+    "lint-sol-fix": "prettier --write \"contracts/**/*.sol\"",
+    "publish-to-npm": "npm run lint-fix && bash ./scripts/publish.sh"
   },
   "dependencies": {
     "@openzeppelin/contracts": "5.0.0",

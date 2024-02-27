@@ -1,0 +1,19 @@
+{
+  "name": "@rarimo/worldid-integration-contracts",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Global Web3 Sandbox Ltd",
+  "description": "WorldID <> Rarimo",
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart-contracts"
+  ],
+  "files": [
+    "**/*.sol",
+    "!mock/**/*"
+  ],
+  "dependencies": {
+    "@rarimo/evm-bridge-contracts": "1.0.0"
+  }
+}
