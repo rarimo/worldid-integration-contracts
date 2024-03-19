@@ -18,8 +18,9 @@ contract IdentityManager is IIdentityManager, WorldIDBridge, Signers {
     mapping(uint256 => RootData) internal _roots;
 
     /**
-     *
      * @notice Init function
+     * @param treeDepth_ the semaphore tree depth (30 in WorldID)
+     * @param semaphoreVerifier_ the ZK verifier contract
      * @param signer_ the Rarimo TSS signer
      * @param sourceStateContract_ the WorldID state contract address on mainnet
      * @param chainName_ the chain name the contract is being deployed to
