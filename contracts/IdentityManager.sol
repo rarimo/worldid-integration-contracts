@@ -1,35 +1,39 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
-import "@rarimo/evm-bridge-contracts/utils/Signers.sol";
+import {Signers} from "@rarimo/evm-bridge-contracts/utils/Signers.sol";
 
-import "./interfaces/IIdentityManager.sol";
+import {WorldIDBridge} from "./vendor/worldcoin/world-id-state-bridge/WorldIDBridge.sol";
+
+import {IIdentityManager} from "./interfaces/IIdentityManager.sol";
 
 /**
  * @title Rarimo identity manager contract that operates and accepts states from WorldID
  */
-contract IdentityManager is IIdentityManager, Signers {
-    uint256 public constant ROOT_EXPIRATION_TIME = 1 hours;
-
+contract IdentityManager is IIdentityManager, WorldIDBridge, Signers {
     address public sourceStateContract;
 
-    uint256 internal _latestRoot;
     uint256 internal _latestTimestamp;
 
     mapping(uint256 => RootData) internal _roots;
 
     /**
      * @notice Init function
+     * @param treeDepth_ the semaphore tree depth (30 in WorldID)
+     * @param semaphoreVerifier_ the ZK verifier contract
      * @param signer_ the Rarimo TSS signer
      * @param sourceStateContract_ the WorldID state contract address on mainnet
      * @param chainName_ the chain name the contract is being deployed to
      */
     function __IdentityManager_init(
+        uint8 treeDepth_,
+        address semaphoreVerifier_,
         address signer_,
         address sourceStateContract_,
         string calldata chainName_
     ) external initializer {
-        __Signers_init(signer_, chainName_);
+        __WorldIDBridge_init(treeDepth_, semaphoreVerifier_);
+        __Signers_init(signer_, address(0), chainName_);
 
         sourceStateContract = sourceStateContract_;
     }
@@ -46,7 +50,7 @@ contract IdentityManager is IIdentityManager, Signers {
         uint256 postRoot_,
         uint256 replacedAt_,
         bytes calldata proof_
-    ) external override {
+    ) external {
         RootData storage _prevRoot = _roots[prevRoot_];
 
         require(prevRoot_ != postRoot_, "IdentityManager: same prev and post roots");
@@ -61,7 +65,7 @@ contract IdentityManager is IIdentityManager, Signers {
         if (replacedAt_ >= _latestTimestamp) {
             _roots[_latestRoot].replacedBy = postRoot_;
 
-            _latestRoot = postRoot_;
+            _receiveRoot(postRoot_, replacedAt_);
             _latestTimestamp = replacedAt_;
         }
 
@@ -72,21 +76,10 @@ contract IdentityManager is IIdentityManager, Signers {
     }
 
     /**
-     * @notice The function to check whether the root is expired
-     * @param root_ the root to check
-     * @return true if root is expired
+     * @notice The function to update the root expiry time
+     * @param expiryTime_ new history root expiry time
      */
-    function isExpiredRoot(uint256 root_) public view override returns (bool) {
-        if (!rootExists(root_)) {
-            return true;
-        }
-
-        if (isLatestRoot(root_)) {
-            return false;
-        }
-
-        return block.timestamp > _roots[root_].replacedAt + ROOT_EXPIRATION_TIME;
-    }
+    function setRootHistoryExpiry(uint256 expiryTime_) public override {}
 
     /**
      * @notice The function to check whether the root exists
@@ -94,7 +87,7 @@ contract IdentityManager is IIdentityManager, Signers {
      * @return true if root exists
      */
     function rootExists(uint256 root_) public view override returns (bool) {
-        return _roots[root_].replacedAt != 0 || isLatestRoot(root_);
+        return rootHistory[root_] != 0;
     }
 
     /**
@@ -103,16 +96,7 @@ contract IdentityManager is IIdentityManager, Signers {
      * @return true if the root is the latest root
      */
     function isLatestRoot(uint256 root) public view override returns (bool) {
-        return _latestRoot == root;
-    }
-
-    /**
-     * @notice The function to get the latest root
-     * @return the latest root
-     * @return the transition timestamp
-     */
-    function getLatestRoot() external view override returns (uint256, uint256) {
-        return (_latestRoot, _latestTimestamp);
+        return latestRoot() == root;
     }
 
     /**
@@ -128,7 +112,7 @@ contract IdentityManager is IIdentityManager, Signers {
                 replacedBy: _root.replacedBy,
                 replacedAt: _root.replacedAt,
                 isLatest: isLatestRoot(root_),
-                isExpired: isExpiredRoot(root_)
+                isValid: isValidRoot(root_)
             });
     }
 
