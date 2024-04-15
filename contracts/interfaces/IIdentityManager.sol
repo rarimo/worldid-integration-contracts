@@ -19,12 +19,12 @@ interface IIdentityManager {
     /// @param replacedAt the timestamp when this root has been replaced
     /// @param replacedBy the root by which this root has been replaced
     /// @param isCurrent the boolean flag indicating whether the queried root is the latest one
-    /// @param isExpired the boolean flag indicating whether the root is expired
+    /// @param isValid the boolean flag indicating whether the root is valid (not expired)
     struct RootInfo {
         uint256 replacedBy;
         uint256 replacedAt;
         bool isLatest;
-        bool isExpired;
+        bool isValid;
     }
 
     /// @notice The event that is emitted when the Merkle root history is updated
@@ -39,23 +39,6 @@ interface IIdentityManager {
         uint256 latestRoot
     );
 
-    /// @notice The function that updates the Merkle root history
-    /// @param prevRoot_ the root that has been replaced
-    /// @param postRoot_ the root by which prevRoot root has been replaced
-    /// @param replacedAt_ the timestamp when the prevRoot has been replaced
-    /// @param proof_ the proof of entry of the relevant leaf into Merkle Tree together with signature from Rarimo validators
-    function signedTransitRoot(
-        uint256 prevRoot_,
-        uint256 postRoot_,
-        uint256 replacedAt_,
-        bytes calldata proof_
-    ) external;
-
-    /// @notice The function that checks whether the root is expired
-    /// @param root_ the root to be checked
-    /// @return isExpired_ the boolean flag indicating whether the `root_` is expired
-    function isExpiredRoot(uint256 root_) external view returns (bool isExpired_);
-
     /// @notice The function that checks whether the root exists
     /// @param root_ the root to be checked
     /// @return doesExist_ the boolean flag indicating whether the `root_` exists
@@ -65,11 +48,6 @@ interface IIdentityManager {
     /// @param root_ the root to be checked
     /// @return isLatest_ the boolean flag indicating whether the `root_` is the latest root
     function isLatestRoot(uint256 root_) external view returns (bool isLatest_);
-
-    /// @notice The function that returns the information about the latest recorded root
-    /// @return latestRoot_ the latest root
-    /// @return latestTimestamp_ the timestamp when the `latestRoot_` replaced the previous root
-    function getLatestRoot() external view returns (uint256 latestRoot_, uint256 latestTimestamp_);
 
     /// @notice The function that returns the information about any root
     /// @param root_ the root to be checked

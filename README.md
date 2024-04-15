@@ -6,9 +6,9 @@ This repository manages the smart contracts that handle Rarimo <> WorldID integr
 
 The repository consists of three smart contracts:
 
-- `IdentityManager` that stores and updates the WorldID state roots via Rarimo TSS transition function
-- `Verifier` that verifies user ZK proofs and checks the validity of the root the proof is generated against
+- `IdentityManager` that stores and updates the WorldID state roots via Rarimo TSS transition function and verifies user ZK proofs
 - `SemaphoreVerifier` that actually verifies ZK proofs (forked from WorldID contracts)
+- `WorldIDBridge` that sets the interface and integration flow for the `IdentityManager`
 
 Together these smart contracts allow WorldID to become cross-chain leveraging Rarimo multichain technology.
 

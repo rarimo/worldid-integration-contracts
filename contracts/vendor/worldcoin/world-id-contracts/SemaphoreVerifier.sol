@@ -2,7 +2,7 @@
 
 import {ISemaphoreVerifier} from "./interfaces/ISemaphoreVerifier.sol";
 
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
 /// @title Groth16 verifier template.
 /// @author Remco Bloemen
