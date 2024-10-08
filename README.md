@@ -30,19 +30,20 @@ npm run coverage
 
 ### Deployment
 
-Prior deployment create the `.env` file following the example provided in `.env.example`. Also check out the required config in the `deploy/config/config.json` file.
+Prior deployment create the `.env` file following the example provided in `.env.example`. Also check out the config files in the `deploy/config/` directory.
 
 The config structure is the following:
 
-```json
-{
-  "signer": "0x0000000000000000000000000000000000000000",
-  "sourceStateContract": "0x0000000000000000000000000000000000000000",
-  "chainName": "CHAIN_NAME"
-}
+```ts
+export const signer = "0x0000000000000000000000000000000000000000";
+export const sourceStateContract = "0x0000000000000000000000000000000000000000";
+export const chainName = "DEPLOYMENT_CHAIN_NAME";
 ```
 
 Where `signer` is the address of Rarimo TSS signer, `sourceStateContract` is the address of WorldID manager contract to listed to, and `chainName` is the name of the network (e.g. Ethereum, Sepolia, Mumbai) where the contracts are being deployed to.
+
+> [!NOTE]
+> The appropriate config file gets chosen automatically upon the deployment network.
 
 After the configuration is provided, execute:
 
