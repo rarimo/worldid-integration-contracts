@@ -2,11 +2,13 @@ import { Deployer, Reporter } from "@solarity/hardhat-migrate";
 
 import { SemaphoreVerifier__factory, IdentityManager__factory } from "@ethers-v6";
 
-import config from "@/deploy/config/config.json";
+import { getConfig } from "./config/config";
 
 const GLOBAL_TREE_DEPTH = 30;
 
 export = async (deployer: Deployer) => {
+  const config = (await getConfig())!;
+
   const semaphoreVerifier = await deployer.deploy(SemaphoreVerifier__factory);
   const identityManager = await deployer.deploy(IdentityManager__factory);
 
